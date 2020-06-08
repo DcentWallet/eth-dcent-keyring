@@ -64,7 +64,6 @@ class DcentKeyring extends EventEmitter {
       ).then((response) => {
         if (response.header.status === DcentResult.SUCCESS) {
           LOG('getAddress return - ', response.body.parameter.address)
-          console.log('1 getAddress return - ', response.body.parameter.address)
           resolve(response.body.parameter.address) // return address of first account
         } else if (response.body.error) {
           reject(new Error(`${response.body.error.code} - ${response.body.error.message}`))
@@ -78,9 +77,7 @@ class DcentKeyring extends EventEmitter {
           reject(new Error(`Unknown error - ${e}`))
         }
       }).finally((_) => {
-        setTimeout(() => {
-          DcentConnector.popupWindowClose()
-        }, 50)
+        DcentConnector.popupWindowClose()
       })
     })
   }
@@ -180,7 +177,6 @@ class DcentKeyring extends EventEmitter {
               tx.v = response.body.parameter.sign_v
               tx.r = response.body.parameter.sign_r
               tx.s = response.body.parameter.sign_s
-              console.log('response signed Tx : ', response.body.parameter.signed)
               const signedTx = new Transaction(tx)
 
               const addressSignedWith = ethUtil.toChecksumAddress(`0x${signedTx.from.toString('hex')}`)
@@ -188,7 +184,6 @@ class DcentKeyring extends EventEmitter {
               if (addressSignedWith !== correctAddress) {
                 reject(new Error('signature doesnt match the right address'))
               }
-              console.log('signedTx : ', signedTx)
               resolve(signedTx)
             } else if (response.body.error) {
               reject(new Error(`${response.body.error.code} - ${response.body.error.message}`))
@@ -202,9 +197,7 @@ class DcentKeyring extends EventEmitter {
               reject(new Error(`Unknown error - ${e}`))
             }
           }).finally((_) => {
-            setTimeout(() => {
-              DcentConnector.popupWindowClose()
-            }, 50)
+            DcentConnector.popupWindowClose()
           })
         }).catch((e) => {
           if (e.body.error) {
@@ -242,20 +235,16 @@ class DcentKeyring extends EventEmitter {
               reject(new Error(`Unknown error - ${response}`))
             }
           }).catch((e) => {
-            console.log('Error while trying to sign a message ', e)
             if (e.body.error) {
               reject(new Error(`${e.body.error.code} - ${e.body.error.message}`))
             } else {
               reject(new Error(`Unknown error - ${e}`))
             }
           }).finally((_) => {
-            setTimeout(() => {
-              DcentConnector.popupWindowClose()
-            }, 50)
+            DcentConnector.popupWindowClose()
           })
 
         }).catch((e) => {
-          console.log('Error while trying to sign a message ', e)
           if (e.body.error) {
             reject(new Error(`${e.body.error.code} - ${e.body.error.message}`))
           } else {
