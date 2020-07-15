@@ -64,6 +64,7 @@ class DcentKeyring extends EventEmitter {
       ).then((response) => {
         if (response.header.status === DcentResult.SUCCESS) {
           LOG('getAddress return - ', response.body.parameter.address)
+          this.accounts = [ response.body.parameter.address ]
           resolve(response.body.parameter.address) // return address of first account
         } else if (response.body.error) {
           reject(new Error(`${response.body.error.code} - ${response.body.error.message}`))
