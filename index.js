@@ -20,6 +20,7 @@ class DcentKeyring extends EventEmitter {
     super()
     this.type = keyringType
     this.accounts = []
+    this._accounts = []
     this.page = 0
     this.perPage = 1 // support only one account
     this.unlockedAccount = 0
@@ -33,6 +34,7 @@ class DcentKeyring extends EventEmitter {
   serialize () {
     return Promise.resolve({
       accounts: this.accounts,
+      _accounts: this._accounts,
       // page: this.page,
       // paths: this.paths,
       // perPage: this.perPage,
@@ -42,20 +44,21 @@ class DcentKeyring extends EventEmitter {
 
   deserialize (opts = {}) {
     this.accounts = opts.accounts || []
+    this._accounts = opts._accounts || []
     // this.page = opts.page || 0
     // this.perPage = opts.perPage || 1
     return Promise.resolve()
   }
 
   isUnlocked () {
-    LOG('isUnlocked - ', Boolean(this.accounts && this.accounts.length !== 0))
-    return Boolean(this.accounts && this.accounts.length !== 0)
+    LOG('isUnlocked - ', Boolean(this._accounts && this._accounts.length !== 0))
+    return Boolean(this._accounts && this._accounts.length !== 0)
   }
 
   unlock () {
     LOG('unlock ENTER')
     if (this.isUnlocked()) {
-      return Promise.resolve(this.accounts[0]) // return first account address
+      return Promise.resolve(this._accounts[0]) // return first account address
     }
     return new Promise((resolve, reject) => {
       DcentConnector.getAddress(
@@ -64,7 +67,7 @@ class DcentKeyring extends EventEmitter {
       ).then((response) => {
         if (response.header.status === DcentResult.SUCCESS) {
           LOG('getAddress return - ', response.body.parameter.address)
-          this.accounts = [ response.body.parameter.address ]
+          this._accounts = [ response.body.parameter.address ]
           resolve(response.body.parameter.address) // return address of first account
         } else if (response.body.error) {
           reject(new Error(`${response.body.error.code} - ${response.body.error.message}`))
