@@ -269,6 +269,7 @@ class DcentKeyring extends EventEmitter {
 
   forgetDevice () {
     this.accounts = []
+    this._accounts = []
     this.page = 0
     this.unlockedAccount = 0
     // this.paths = {}

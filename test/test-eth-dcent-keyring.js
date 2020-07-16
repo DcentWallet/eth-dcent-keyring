@@ -37,6 +37,7 @@ describe('DcentKeyring', function () {
 
     keyring.deserialize({
       accounts: [fakeAccounts[0]],
+      _accounts: [fakeAccounts[0]],
     })
   })
 
@@ -96,6 +97,7 @@ describe('DcentKeyring', function () {
     it('should call DcentConnector.getAddress if we dont unlock', function (done) {
 
       keyring.removeAccount(fakeAccounts[0])
+      keyring._accounts = []
       // there is no account !!
       keyring.unlock().catch((e) => {
           // because we're trying to open the dcent popup in node
