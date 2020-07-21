@@ -2,6 +2,7 @@ const { EventEmitter } = require('events')
 const ethUtil = require('ethereumjs-util')
 const Transaction = require('ethereumjs-tx')
 const DcentConnector = require('dcent-web-connector')
+const { getFullPath, getCoinType } = require('./scripts/util')
 
 const DefaultKeyPathString = `m/44'/60'/0'/0/0`
 const keyringType = 'DCENT Hardware'
@@ -25,8 +26,6 @@ class DcentKeyring extends EventEmitter {
     this.perPage = 1 // support only one account
     this.unlockedAccount = 0
     // this.paths = {}
-    this.coinType = DcentConnector.coinType.ETHEREUM
-    this.path = DefaultKeyPathString
     this.deserialize(opts)
     DcentConnector.setTimeOutMs(opts.timeOut || DCENT_TIMEOUT)
   }
@@ -35,6 +34,7 @@ class DcentKeyring extends EventEmitter {
     return Promise.resolve({
       accounts: this.accounts,
       _accounts: this._accounts,
+      hdPath: this.hdPath,
       // page: this.page,
       // paths: this.paths,
       // perPage: this.perPage,
@@ -45,8 +45,11 @@ class DcentKeyring extends EventEmitter {
   deserialize (opts = {}) {
     this.accounts = opts.accounts || []
     this._accounts = opts._accounts || []
+    this.hdPath = opts.hdPath || DefaultKeyPathString
     // this.page = opts.page || 0
     // this.perPage = opts.perPage || 1
+    this.path = getFullPath(this.hdPath, 0)
+    this.coinType = getCoinType(this.path)
     return Promise.resolve()
   }
 
