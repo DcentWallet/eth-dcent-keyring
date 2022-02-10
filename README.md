@@ -8,11 +8,20 @@ In most regards, it works in the same way as [eth-hd-keyring](https://github.com
 - It works the firmware version 1.3.0+ for D'CENT Biometric device
 - It returns only one account. 
 
+## Install
+Run the following command:
+
+```
+yarn add eth-dcent-keyring
+```
+
 ## Testing
 Run the following command:
 
 ```
-npm run test
+yarn 
+
+yarn test
 ```
 
 ## Attributions
