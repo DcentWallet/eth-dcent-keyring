@@ -7,7 +7,6 @@
     "index.js"
   ],
   "scripts": {
-    "setup": "yarn install && yarn allow-scripts",
     "test": "yarn lint && mocha",
     "lint": "./node_modules/.bin/eslint . --ext .js",
     "lint:fix": "./node_modules/.bin/eslint --fix . --ext .js"
