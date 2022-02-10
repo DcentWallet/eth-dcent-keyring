@@ -13,7 +13,8 @@ const DcentResult = {
 
 let LOG
 if (process.env.NODE_ENV !== 'production') {
-  LOG = console.log.bind(console, '[LOG]')
+  // LOG = console.log.bind(console, '[LOG]')
+  LOG = () => {}
 } else {
   LOG = () => {}
 }
@@ -227,7 +228,6 @@ class DcentKeyring extends EventEmitter {
 
   // tx is an instance of the ethereumjs-transaction class.
   signTransaction (address, tx) {
-    console.log('signTransaction start')
     if (isOldStyleEthereumjsTx(tx)) { // old style transaction
       tx.v = ethUtil.bufferToHex(tx.getChainId())
       tx.r = '0x00'
@@ -268,20 +268,6 @@ class DcentKeyring extends EventEmitter {
     transaction.nonce = (transaction.nonce === '0x') ? '0x0' : transaction.nonce
     transaction.value = (transaction.value === '0x') ? '0x0' : transaction.value
 
-    const testtx = 'f9026a11843b9ae3c58307fba294a6b71e26c5e0845f74c812102ca7114b6a896ab280b902041688f0b9000000000000000000000000d9db270c1b5e3bd161e8c8503c55ceabee70955200000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000017ea009ce800000000000000000000000000000000000000000000000000000000000000164b63e800d0000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000140000000000000000000000000f48f2b2d2a534e402487b3ee7c18c33aec0fe5e4000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000100000000000000000000000054b9c508ac61eaf2cd8f9ca510ec3897cfb093820000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002ca0b4428c9be64efa9c22c0214df63b658610dd4b17f52425d6efd3a6c963d2d25ba002db42e306bac0c454a03275cfb27fc6bee0a52dbc1241647a6b8cf861bd7c58'
-    const but = Buffer.from(testtx, 'hex')
-    const r = Buffer.from( ethUtil.stripHexPrefix('0x8bfc799b32458ab43507f54cf2ed6f69e86530ca466886383519d8069133c196'), 'hex')
-    const s = Buffer.from('0x7bc4bdeffc12eb3c00b67275dba9dc8500067ea7d9ae4d7c818bba9cb08b0147', 'hex')
-    const v = Buffer.from('0x2c', 'hex')
-    LOG('r', r)
-    LOG('s', s)
-    LOG('r', v)
-    LOG('Transaction', TransactionFactory.fromSerializedData(but))
-    // const aaa = TransactionFactory.fromSerializedData(but)
-    // const aaa = TransactionFactory.fromSerializedData(but)
-    // LOG('aaa', aaa)
-    // LOG('signTransaction - address', address)
-    // LOG('signTransaction - transaction', transaction)
     return new Promise((resolve, reject) => {
       this.unlock()
         .then((_) => {
@@ -296,21 +282,11 @@ class DcentKeyring extends EventEmitter {
             this.path, // key path
             transaction.chainId
           ).then((response) => {
-            console.log('response - ', response)
+            LOG('response - ', response)
             if (response.header.status === DcentResult.SUCCESS) {
               const parameter = response.body.parameter
-              console.log('parameter - ', parameter)
-              console.log('parameter.signed - ', parameter.signed)
-              console.log('parameter.sing_v - ', parameter.sign_v)
-              console.log('parameter.sing_r - ', parameter.sign_r)
-              console.log('parameter.sing_s - ', parameter.sign_s)
               const signedBuffer = Buffer.from(parameter.signed, 'hex')
-              LOG('signedBuffer - ', signedBuffer)
-              LOG('TransactionFactory', TransactionFactory)
-              LOG('TransactionFactory', TransactionFactory.fromSerializedData)
-
               const tempTx = TransactionFactory.fromSerializedData(signedBuffer)
-              console.log('tempTx - ', tempTx)
 
               let signedTx = tx
               if (isOldStyleEthereumjsTx(tx)) {
@@ -330,7 +306,7 @@ class DcentKeyring extends EventEmitter {
               if (addressSignedWith !== correctAddress) {
                 reject(new Error("signature doesn't match the right address"))
               }
-              console.log('signedTx - ', signedTx)
+              LOG('signedTx - ', signedTx)
               resolve(signedTx)
             } else if (response.body.error) {
               reject(new Error(`${response.body.error.code} - ${response.body.error.message}`))
@@ -339,8 +315,7 @@ class DcentKeyring extends EventEmitter {
             }
 
           }).catch((e) => {
-            console.log('e - ', e)
-            if (e.body.error) {
+            if (e && e.body && e.body.error) {
               reject(new Error(`${e.body.error.code} - ${e.body.error.message}`))
             } else {
               reject(new Error(`Unknown error - ${e}`))
@@ -437,7 +412,7 @@ class DcentKeyring extends EventEmitter {
           })
 
         }).catch((e) => {
-          if (e.body.error) {
+          if (e && e.body && e.body.error) {
             reject(new Error(`${e.body.error.code} - ${e.body.error.message}`))
           } else {
             reject(new Error(`Unknown error - ${e}`))
