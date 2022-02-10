@@ -12,7 +12,7 @@ on:
 jobs:
   lint-build-unit:
 
-    runs-on: windows-latest
+    runs-on: ubuntu-18.04
 
     strategy:
       matrix:
@@ -24,8 +24,8 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - run: npm run test
+    - run: yarn ci
+    - run: yarn test
       env:
         CI: true
         NODE_OPTIONS: --max-old-space-size=8192 
