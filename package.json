@@ -1,10 +1,13 @@
 {
   "name": "eth-dcent-keyring",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "A MetaMask compatible keyring, for D'CENT hardware wallets",
   "main": "index.js",
+  "files": [
+    "index.js"
+  ],
   "scripts": {
-    "test": "npm run lint && mocha",
+    "test": "yarn lint && mocha",
     "lint": "./node_modules/.bin/eslint . --ext .js",
     "lint:fix": "./node_modules/.bin/eslint --fix . --ext .js"
   },
@@ -29,13 +32,12 @@
     "mocha/mkdirp": "^0.5.1"
   },
   "dependencies": {
-    "dcent-web-connector": "^0.8.2",
-    "eth-sig-util": "^1.4.2",
-    "ethereumjs-tx": "^1.3.4",
-    "ethereumjs-util": "^5.1.5",
-    "events": "^2.0.0"
+    "@ethereumjs/tx": "3.2.1",
+    "ethereumjs-util": "7.0.9",
+    "dcent-web-connector": "^0.10.5"
   },
   "devDependencies": {
+    "@lavamoat/allow-scripts": "^1.0.6",
     "assert": "^1.4.1",
     "babel-eslint": "^8.0.0",
     "babel-runtime": "^6.26.0",
@@ -45,6 +47,10 @@
     "eslint-plugin-chai": "0.0.1",
     "eslint-plugin-json": "^1.2.0",
     "eslint-plugin-mocha": "^5.0.0",
+    "ethereumjs-tx": "^1.3.4",
     "mocha": "^5.0.4"
+  },
+  "engines": {
+    "node": ">=12.0.0"
   }
 }

@@ -286,16 +286,43 @@ describe('DcentKeyring', function () {
   })
 
   describe('signTypedData', function () {
-    it('should throw an error because it is not supported', async function () {
-      let error = null
-      try {
-        await keyring.signTypedData()
-      } catch (e) {
-        error = e
+    it('should call DcentConnector.getEthereumSignedTypedData', function (done) {
+
+      const sandbox = chai.spy.sandbox()
+      sandbox.on(DcentConnector, 'getEthereumSignedTypedData')
+      const typedData = {
+        types: {
+          EIP712Domain: [
+            {name: 'name', type: 'string'},
+            {name: 'version', type: 'string'},
+            {name: 'chainId', type: 'uint256'},
+            {name: 'verifyingContract', type: 'address'},
+          ],
+          Person: [
+            {name: 'name', type: 'string'},
+            {name: 'wallet', type: 'address'},
+          ],
+        },
+        primaryType: 'Person',
+        domain: {
+          name: 'Ether Mail',
+          version: '1',
+          chainId: 1,
+          verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
+        },
+        message: {
+          'name': 'Bob',
+          'wallet': '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+        },
       }
 
-      expect(error instanceof Error, true)
-      expect(error.toString(), 'Not supported on this device')
+      keyring.signTypedData(fakeAccounts[0], typedData).catch((e) => {
+        // we expect this to be rejected because
+        // we are trying to open a popup from node
+        expect(DcentConnector.getEthereumSignedTypedData).to.have.been.called()
+        sandbox.restore()
+        done()
+      })
     })
   })
 
