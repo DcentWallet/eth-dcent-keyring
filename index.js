@@ -77,9 +77,8 @@ const getCoinType = path => {
 }
 
 const getTypedTxOption = (type, transactionJson) => {
-  
-  if (type === 1 || type === 2){
-    let optParams = {}
+  if (type === 1 || type === 2) {
+    const optParams = {}
     optParams.accessList = transactionJson.accessList
     if (type === 2) {
       optParams.maxPriorityFeePerGas = transactionJson.maxPriorityFeePerGas
@@ -292,7 +291,7 @@ class DcentKeyring extends EventEmitter {
     }
     transaction.nonce = (transaction.nonce === '0x') ? '0x0' : transaction.nonce
     transaction.value = (transaction.value === '0x') ? '0x0' : transaction.value
-    typedOpstions = getTypedTxOption(txType, transaction)
+    const typedOpstions = getTypedTxOption(txType, transaction)
     return new Promise((resolve, reject) => {
       this.unlock()
         .then((_) => {
