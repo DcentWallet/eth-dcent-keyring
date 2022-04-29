@@ -34,7 +34,7 @@
   "dependencies": {
     "@ethereumjs/tx": "3.2.1",
     "ethereumjs-util": "7.0.9",
-    "dcent-web-connector": "file:../dcent-web-connect"
+    "dcent-web-connector": "^0.11.2"
   },
   "devDependencies": {
     "@lavamoat/allow-scripts": "^1.0.6",

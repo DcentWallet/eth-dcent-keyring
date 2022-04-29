@@ -630,10 +630,10 @@ dashdash@^1.12.0:
   dependencies:
     assert-plus "^1.0.0"
 
-dcent-web-connector@^0.10.5:
-  version "0.10.5"
-  resolved "https://registry.yarnpkg.com/dcent-web-connector/-/dcent-web-connector-0.10.5.tgz#1e1a075c55c8c48f63eed96afeb9c62683104f18"
-  integrity sha512-gW/ZUaSqaYRuAI9ASAw1tsUHvGD+r1QLcDYCB5zhBJ06O3xkWKU42MlU3IFXwV1Hp0t8rGyrUar58wkex7vziA==
+dcent-web-connector@^0.11.2:
+  version "0.11.2"
+  resolved "https://registry.yarnpkg.com/dcent-web-connector/-/dcent-web-connector-0.11.2.tgz#c0bae44d847dfd1d5bbd93ba2ea4053b3673005d"
+  integrity sha512-2B1xcHe5wgQ9HLWewyAGm7PYwUvjBFCJiKB7Kgos+qcmCQUyDRCgxrqmN2Lz2wGgtuNViyaYWYApkTd6KHHoRw==
   dependencies:
     events "^3.0.0"
 
