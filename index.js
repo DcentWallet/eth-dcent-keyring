@@ -76,6 +76,21 @@ const getCoinType = path => {
   return type
 }
 
+const getTypedTxOption = (type, transactionJson) => {
+  if (type === 1 || type === 2) {
+    const optParams = {}
+    optParams.accessList = transactionJson.accessList
+    if (type === 2) {
+      optParams.maxPriorityFeePerGas = transactionJson.maxPriorityFeePerGas
+      optParams.maxFeePerGas = transactionJson.maxFeePerGas
+    }
+
+    return optParams
+  }
+
+  return {}
+}
+
 function isOldStyleEthereumjsTx (tx) {
   return typeof tx.getChainId === 'function'
 }
@@ -93,6 +108,10 @@ class DcentKeyring extends EventEmitter {
     // this.paths = {}
     this.deserialize(opts)
     DcentConnector.setTimeOutMs(opts.timeOut || DCENT_TIMEOUT)
+  }
+
+  getModel () {
+    return 'DCENT Biometric Wallet'
   }
 
   serialize () {
@@ -246,6 +265,7 @@ class DcentKeyring extends EventEmitter {
   _signTransaction (address, chainId, tx) {
 
     let transaction
+    let txType = 0
     if (isOldStyleEthereumjsTx(tx)) {
       // legacy transaction from ethereumjs-tx package has no .toJSON() function,
       // so we need to convert to hex-strings manually manually
@@ -259,6 +279,10 @@ class DcentKeyring extends EventEmitter {
         gasPrice: this._normalize(tx.gasPrice),
       }
     } else {
+      if (tx._type === 1 || tx._type === 2) {
+        txType = tx._type
+      }
+
       transaction = {
         ...tx.toJSON(),
         chainId,
@@ -267,7 +291,7 @@ class DcentKeyring extends EventEmitter {
     }
     transaction.nonce = (transaction.nonce === '0x') ? '0x0' : transaction.nonce
     transaction.value = (transaction.value === '0x') ? '0x0' : transaction.value
-
+    const typedOpstions = getTypedTxOption(txType, transaction)
     return new Promise((resolve, reject) => {
       this.unlock()
         .then((_) => {
@@ -280,7 +304,9 @@ class DcentKeyring extends EventEmitter {
             transaction.value,
             transaction.data,
             this.path, // key path
-            transaction.chainId
+            transaction.chainId,
+            txType,
+            typedOpstions
           ).then((response) => {
             LOG('response - ', response)
             if (response.header.status === DcentResult.SUCCESS) {
@@ -379,7 +405,7 @@ class DcentKeyring extends EventEmitter {
     })
   }
 
-  signTypedData (withAccount, typedData) {
+  signTypedData (withAccount, typedData, opts) {
     // Waiting on dcent to enable this
     LOG('signPersonalMessage - withAccount', withAccount)
     LOG('signTypedData - typedData', typedData)
@@ -387,9 +413,9 @@ class DcentKeyring extends EventEmitter {
     return new Promise((resolve, reject) => {
       this.unlock()
         .then((_) => {
-          DcentConnector.getEthereumSignedTypedData(
-            typedData,
-            this.path
+          DcentConnector.getSignedData(
+            this.path,
+            { payload: typedData, version: opts.version }
           ).then((response) => {
             if (response.header.status === DcentResult.SUCCESS) {
               if (response.body.parameter.address !== ethUtil.toChecksumAddress(withAccount)) {

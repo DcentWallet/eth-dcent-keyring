@@ -7,6 +7,7 @@ const spies = require('chai-spies')
 
 const { expect } = chai
 const EthereumTx = require('ethereumjs-tx')
+const { TransactionFactory } = require('@ethereumjs/tx')
 const assert = require('assert')
 const DcentConnector = require('dcent-web-connector')
 
@@ -22,6 +23,29 @@ const fakeTx = new EthereumTx({
   // EIP 155 chainId - mainnet: 1, ropsten: 3
   chainId: 1,
 })
+
+const fakeTypedTx = TransactionFactory.fromTxData({
+      gasLimit: '0x02625a00',
+      maxPriorityFeePerGas: '0x01',
+      maxFeePerGas: '0xe1e1',
+      gasPrice: '0xdd',
+      nonce: '0x00',
+      to: '0x0000000000000000000000000000000000000101',
+      value: '0x0186a0',
+      chainId: '0x2019',
+      accessList: [
+          {
+            'address': '0x0000000000000000000000000000000000000101',
+            'storageKeys': [
+              '0x0000000000000000000000000000000000000000000000000000000000000000',
+              '0x00000000000000000000000000000000000000000000000000000000000060a7',
+            ],
+          },
+        ],
+      type: 2,
+      key: "m/44'/60'/0'/0/0",
+})
+
 const fakeAccounts = [
   '0xF30952A1c534CDE7bC471380065726fa8686dfB3',
 ]
@@ -254,6 +278,16 @@ describe('DcentKeyring', function () {
         done()
       })
     })
+
+    it('should call DcentConnector.getEthereumSignedTransaction(typedTx)', function (done) {
+      keyring.signTransaction(fakeAccounts[0], fakeTypedTx).catch((e) => {
+        // we expect this to be rejected because
+        // we are trying to open a popup from node
+        assert.equal(e.toString().includes('pop-up_blocked'), true)
+        expect(DcentConnector.getEthereumSignedTransaction).to.have.been.called()
+        done()
+      })
+    })
   })
 
   describe('signMessage', function () {
@@ -286,10 +320,10 @@ describe('DcentKeyring', function () {
   })
 
   describe('signTypedData', function () {
-    it('should call DcentConnector.getEthereumSignedTypedData', function (done) {
+    it('should call DcentConnector.getSignedData', function (done) {
 
       const sandbox = chai.spy.sandbox()
-      sandbox.on(DcentConnector, 'getEthereumSignedTypedData')
+      sandbox.on(DcentConnector, 'getSignedData')
       const typedData = {
         types: {
           EIP712Domain: [
@@ -316,10 +350,10 @@ describe('DcentKeyring', function () {
         },
       }
 
-      keyring.signTypedData(fakeAccounts[0], typedData).catch((e) => {
+      keyring.signTypedData(fakeAccounts[0], typedData, {version: 'V4'}).catch((e) => {
         // we expect this to be rejected because
         // we are trying to open a popup from node
-        expect(DcentConnector.getEthereumSignedTypedData).to.have.been.called()
+        expect(DcentConnector.getSignedData).to.have.been.called()
         sandbox.restore()
         done()
       })
