@@ -1,0 +1,1 @@
+export { DcentKeyring as default } from './index';
